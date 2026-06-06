@@ -1,26 +1,172 @@
+<!DOCTYPE html>
+<html>
 <head>
     <title>Slope | Derpman's website</title>
     <link rel="icon" href="slope.png">
     <link rel="stylesheet" href="TemplateData/style.css">
     <script src="TemplateData/UnityProgress.js"></script>
     <script src="TemplateData/unityloader41.js"></script>
-    <script>
-        var gameInstance = UnityLoader.instantiate("gameContainer", "Build/slope.json", { onProgress: UnityProgress, Module: { onRuntimeInitialized: function() { UnityProgress(gameInstance, "complete") } } });
-    </script>
+
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2541434264715219"
      crossorigin="anonymous"></script>
 </head>
-<!--- 
-Want to run or host yourself? Check out the source? 
-https://github.com/cgolden15/Slope-Game/ 
 
-Drop a star on the repo if you enjoy.
---->
 <body style="margin: 0; overflow: hidden;">
-    <div class="webgl-content">
-        <div id="gameContainer" style="width: 100%; height: 100%; margin: 0;"></div>
+
+<!-- 🔒 BOOT + LOCK SCREEN -->
+<div id="bootScreen" style="
+    position: fixed;
+    inset: 0;
+    background: black;
+    color: #ffffff;
+    font-family: 'Courier New', monospace;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 999999;
+    font-size: 26px;
+    text-shadow: 0 0 8px #ffffff;
+    opacity: 1;
+    transition: opacity 0.6s ease;
+">
+    <span id="bootText"></span>
+</div>
+
+<div id="lockscreen" style="
+    position: fixed;
+    inset: 0;
+    background: black;
+    color: #ffffff;
+    font-family: 'Courier New', monospace;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    z-index: 999998;
+">
+    <h1 style="
+        font-size: 32px;
+        margin-bottom: 20px;
+        color: #ffffff;
+        text-shadow: 0 0 8px #ffffff;
+        letter-spacing: 2px;
+    ">
+        ENTER CODE BELOW
+    </h1>
+
+    <input id="codeInput" type="password" style="
+        background: black;
+        border: 2px solid #ffffff;
+        color: #ffffff;
+        padding: 10px 15px;
+        font-size: 20px;
+        width: 260px;
+        text-align: center;
+        outline: none;
+        font-family: 'Courier New', monospace;
+        box-shadow: 0 0 10px #ffffff;
+    ">
+
+    <button onclick="unlock()" style="
+        margin-top: 20px;
+        padding: 10px 25px;
+        background: black;
+        border: 2px solid #ffffff;
+        color: #ffffff;
+        font-size: 18px;
+        cursor: pointer;
+        font-family: 'Courier New', monospace;
+        text-shadow: 0 0 6px #ffffff;
+        box-shadow: 0 0 10px #ffffff;
+    ">
+        UNLOCK
+    </button>
+
+    <p id="error" style="
+        color: #ff4444;
+        margin-top: 15px;
+        font-size: 18px;
+        display: none;
+        text-shadow: 0 0 6px #ff0000;
+    ">
+        Incorrect code
+    </p>
+
+    <div style="
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        color: rgba(255, 255, 255, 0.35);
+        font-family: 'Courier New', monospace;
+        font-size: 14px;
+        pointer-events: none;
+        text-shadow: 0 0 6px rgba(255, 255, 255, 0.4);
+    ">
+        made by adam s
     </div>
-    <script async src="//static.getclicky.com/101357250.js"></script>
-    <noscript><p><img alt="Clicky" width="1" height="1" src="//in.getclicky.com/101357250ns.gif" /></p></noscript>
+</div>
+
+<!-- 🎮 UNITY GAME CONTAINER -->
+<div class="webgl-content">
+    <div id="gameContainer" style="width: 100%; height: 100%; margin: 0;"></div>
+</div>
+
+<script async src="//static.getclicky.com/101357250.js"></script>
+<noscript><p><img alt="Clicky" width="1" height="1" src="//in.getclicky.com/101357250ns.gif" /></p></noscript>
+
+<script>
+    const ACCESS_CODE = "1234"; // change this
+
+    // Boot animation
+    const bootMessage = "hello. you are using a zeitsite.";
+    let index = 0;
+
+    function typeBootText() {
+        const el = document.getElementById("bootText");
+        if (index < bootMessage.length) {
+            el.textContent += bootMessage[index];
+            index++;
+            setTimeout(typeBootText, 70);
+        } else {
+            setTimeout(() => {
+                document.getElementById("bootScreen").style.opacity = "0";
+                setTimeout(() => {
+                    document.getElementById("bootScreen").remove();
+                    document.getElementById("lockscreen").style.display = "flex";
+                }, 600);
+            }, 700);
+        }
+    }
+
+    window.onload = () => {
+        typeBootText();
+    };
+
+    function unlock() {
+        const input = document.getElementById("codeInput").value;
+        if (input === ACCESS_CODE) {
+            document.getElementById("lockscreen").style.opacity = "0";
+            setTimeout(() => {
+                document.getElementById("lockscreen").remove();
+
+                // Load Unity AFTER unlocking
+                UnityLoader.instantiate("gameContainer", "Build/slope.json", { 
+                    onProgress: UnityProgress,
+                    Module: { 
+                        onRuntimeInitialized: function() { 
+                            UnityProgress(gameInstance, "complete");
+                        } 
+                    }
+                });
+
+            }, 400);
+        } else {
+            document.getElementById("error").style.display = "block";
+        }
+    }
+</script>
+
 </body>
-<!-- Slope game by y8 games, not me.-->
+</html>
